@@ -1,0 +1,15 @@
+version: '2.3'
+services:
+  phusion:
+    build: ./
+    ports:
+      - ${PORT:-53}:53/tcp
+      - ${PORT:-53}:53/udp
+    volumes:
+      # timezone 
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+
+# vim: et sw=2 ts=2

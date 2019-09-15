@@ -1,0 +1,66 @@
+version: '2.3'
+services:
+  daemon:
+    build: ./daemon/
+    networks:
+      - net
+    ports:
+      - ${DAEMON_PEERPORT:-9090}:9090/tcp
+      - ${DAEMON_PEERPORT:-9090}:9090/udp
+      - ${DAEMON_PORT:-9091}:9091/tcp
+    # TODO (see: https://github.com/moby/moby/issues/30778)
+    #sysctls:
+      #- net.core.rmem_max=4194304
+      #- net.core.wmem_max=1048576
+    ulimits:
+      nofile: 1048576
+    volumes:
+      # config directory
+      - type: volume
+        source: cache_daemon
+        target: /var/lib/transmission-daemon/config/
+      # download directory
+      - type: bind
+        source: ${DAEMON_DOWNLOAD_DIR:?err}
+        target: /var/lib/transmission-daemon/download/
+      # watch directory
+      - type: bind
+        source: ${DAEMON_WATCH_DIR:?err}
+        target: /var/lib/transmission-daemon/watch/
+      # configuration file
+      - type: bind
+        source: ./config-daemon.json
+        target: /etc/transmission-daemon/settings.json
+      # timezone 
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+  rss:
+    build: ./rss/
+    depends_on:
+      - daemon
+    networks:
+      - net
+    volumes:
+      # config directory
+      - type: volume
+        source: cache_rss
+        target: /root/.config/transmission/
+      # configuration file
+      - type: bind
+        source: ./config-rss.yaml
+        target: /etc/transmission-rss.conf
+      # timezone 
+      - type: bind
+        source: /etc/localtime
+        target: /etc/localtime
+        read_only: true
+networks:
+  net:
+    driver: bridge
+volumes:
+  cache_daemon:
+  cache_rss:
+
+# vim: et sw=2 ts=2

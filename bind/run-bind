@@ -1,0 +1,4 @@
+#!/bin/sh
+set -e
+(mkdir -p /run/named && chmod 755 /run/named && chown bind: /run/named) || true
+exec /usr/sbin/named -f -u bind

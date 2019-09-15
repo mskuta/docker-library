@@ -1,0 +1,11 @@
+feeds:
+  - url:
+
+update_interval: 3600
+
+add_paused: false
+
+server:
+  host: daemon
+  port: 9091
+

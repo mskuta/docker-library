@@ -1,0 +1,15 @@
+#!/bin/bash
+
+set -euo pipefail
+
+dst='/etc/bind/zones.ignore'
+src="$(mktemp -t)"
+trap 'rm --force "$src"' EXIT
+curl --location --show-error --silent https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | perl -n -e '/^\Q0.0.0.0\E (?!\Q0.0.0.0\E)(\S+)/ && print "zone \"$1\" { type master; file \"/etc/bind/db.null\"; };\n"' >"$src"
+if ! cmp --silent "$src" "$dst"; then
+	mv "$src" "$dst"
+	trap - EXIT
+	chmod 644 "$dst"
+	kill -HUP $(pidof named)
+fi
+

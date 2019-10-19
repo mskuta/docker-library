@@ -1,7 +1,7 @@
 About
 =====
 
-This bundle provides the BIND name server that is configured to act as a caching server for a set of local clients here. It forwards queries through stunnel, which are transported encrypted in this way, and stores the answers in its cache. In addition, a script updates a list of ad- and malware-servers that will be ignored by BIND on a weekly basis. If the addresses of such servers remain unknown, no application can exchange data with them. All devices in the LAN are thus protected without having to deal with each one individually.
+This bundle provides the *bind* name server that is preconfigured to act as a caching server for a set of local clients. It forwards queries through *stunnel* to one or more hosts providing DNS resolver services via DNS over TLS (DoT). Additionally a *cron* job scheduler runs, which triggers a script every week. This in turn downloads the latest version of a list of ad- and malware servers. Their addresses get mapped to IP 0.0.0.0 and are thus rendered invalid. All devices in the LAN that use this name server will be protected from ads and malware in this way. You no longer have to worry about each device individually.
 
 Setup
 =====

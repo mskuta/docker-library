@@ -1,7 +1,5 @@
-About
-=====
-
-This is a collection of configuration files for Docker Compose to provide a variety of application services.
+Applications
+============
 
 * [bind](bind) - Caching name server + DNS over TLS + Ad blocking
 * [freshrss](freshrss) - News reader + Database server

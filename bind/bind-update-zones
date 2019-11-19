@@ -7,9 +7,9 @@ dstpath="$dstdir/zones.invalid"
 srcpath="$(mktemp -t)"
 trap 'rm "$srcpath"' EXIT
 curl --fail --location --show-error --silent https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | perl -n -e '/^\Q0.0.0.0\E (?!\Q0.0.0.0\E)(\S+)/ && print "zone \"$1\" { type master; file \"/etc/bind/db.null\"; };\n"' >"$srcpath"
-if ! cmp --silent "$srcpath" "$dstpath"; then
-	mv "$srcpath" "$dstpath"
-	trap - EXIT
-	chmod 644 "$dstpath"
-fi
+cmp --silent "$srcpath" "$dstpath" && exit 3  # no changes
+mv "$srcpath" "$dstpath"
+trap - EXIT
+chmod 644 "$dstpath"
+exit 0
 

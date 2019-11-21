@@ -19,8 +19,11 @@ Setup
 
 Done!
 
-Acknowledgment
-==============
+Acknowledgments
+===============
 
-This software utilizes a list from the [hosts project of StevenBlack](https://github.com/StevenBlack/hosts).
+This software utilizes domain lists from the following projects:
+
+- [StevenBlack/hosts](https://github.com/StevenBlack/hosts)
+- [anudeepND/whitelist](https://github.com/anudeepND/whitelist)
 

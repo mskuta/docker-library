@@ -5,11 +5,48 @@ set -euo pipefail
 dstdir=${1:-/etc/bind}
 dstpath="$dstdir/zones.invalid"
 srcpath="$(mktemp -t)"
-trap 'rm "$srcpath"' EXIT
-curl --fail --location --show-error --silent https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts | perl -n -e '/^\Q0.0.0.0\E (?!\Q0.0.0.0\E)(\S+)/ && print "zone \"$1\" { type master; file \"/etc/bind/db.null\"; };\n"' >"$srcpath"
+blacklist="$(mktemp -t)"
+whitelist="$(mktemp -t)"
+trap 'rm -f "$srcpath" "$blacklist" "$whitelist"' EXIT
+
+#
+# blacklists
+#
+
+# StevenBlack
+curl --fail --location --show-error --silent https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts \
+  | grep '^0\.0\.0\.0\b' \
+  | cut -d' ' -f2 \
+  | grep -F -v '0.0.0.0' \
+  >>"$blacklist"
+
+# another blacklist (remote)
+#curl --fail --location --show-error --silent https://www.example.com/path/to/list >>"$blacklist"
+
+# another blacklist (local)
+#cat /path/to/list >>"$blacklist"
+
+#
+# whitelists
+#
+
+# anudeepND
+curl --fail --location --show-error --silent https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt \
+  >>"$whitelist"
+
+# another whitelist (remote)
+#curl --fail --location --show-error --silent https://www.example.com/path/to/list >>"$whitelist"
+
+# another whitelist (local)
+#cat /path/to/list >>"$whitelist"
+
+sort --output="$blacklist" --unique "$blacklist"
+sort --output="$whitelist" --unique "$whitelist"
+for domain in $(comm -23 "$blacklist" "$whitelist"); do
+	printf "zone \"%s\" { type master; file \"/etc/bind/db.null\"; };\n" "$domain" >>"$srcpath"
+done
 cmp --silent "$srcpath" "$dstpath" && exit 3  # no changes
 mv "$srcpath" "$dstpath"
-trap - EXIT
 chmod 644 "$dstpath"
 exit 0
 

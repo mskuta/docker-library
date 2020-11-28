@@ -3,9 +3,10 @@ RUN apt-get update \
     && apt-get install --assume-yes --no-install-recommends ca-certificates git \
     && apt-get install --assume-yes --no-install-recommends clang cmake make \
     && apt-get install --assume-yes --no-install-recommends libb64-dev libcurl4-openssl-dev libevent-dev libminiupnpc-dev libnatpmp-dev libssl-dev zlib1g-dev
-RUN git clone https://github.com/transmission/transmission /usr/local/src/transmission \
+# https://github.com/transmission/transmission#building-transmission-from-git-first-time
+RUN git clone --depth=1 https://github.com/transmission/transmission /usr/local/src/transmission \
     && cd /usr/local/src/transmission \
-    && git submodule update --init \
+    && git submodule update --init --depth=1 \
     && mkdir build \
     && cd build \
     && cmake -DENABLE_TESTS=OFF -DINSTALL_DOC=OFF .. \

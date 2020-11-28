@@ -21,11 +21,11 @@ services:
         target: /var/lib/transmission-daemon/config/
       # download directory
       - type: bind
-        source: ${DAEMON_DOWNLOAD_DIR:?err}
+        source: ${DAEMON_DOWNLOAD_DIR:?Set a value for variable DAEMON_DOWNLOAD_DIR in file .env}
         target: /var/lib/transmission-daemon/download/
       # watch directory
       - type: bind
-        source: ${DAEMON_WATCH_DIR:?err}
+        source: ${DAEMON_WATCH_DIR:?Set a value for variable DAEMON_WATCH_DIR in file .env}
         target: /var/lib/transmission-daemon/watch/
       # configuration file
       - type: bind

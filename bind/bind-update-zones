@@ -9,44 +9,62 @@ blacklist="$(mktemp -t)"
 whitelist="$(mktemp -t)"
 trap 'rm -f "$srcpath" "$blacklist" "$whitelist"' EXIT
 
+declare -r curlopts='--fail --location --show-error --silent'
+
 #
 # blacklists
 #
 
-# StevenBlack
-curl --fail --location --show-error --silent https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts \
+echo "Downloading blacklist from StevenBlack"
+curl $curlopts https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts \
   | grep '^0\.0\.0\.0\b' \
   | cut -d' ' -f2 \
   | grep -F -v '0.0.0.0' \
   >>"$blacklist"
 
-# another blacklist (remote)
-#curl --fail --location --show-error --silent https://www.example.com/path/to/list >>"$blacklist"
+# add another blacklist (remote)
+#echo "Downloading another blacklist"
+#curl $curlopts https://www.example.com/path/to/list >>"$blacklist"
 
-# another blacklist (local)
+# add another blacklist (local)
+#echo "Copying another blacklist"
 #cat /path/to/list >>"$blacklist"
 
 #
 # whitelists
 #
 
-# anudeepND
-curl --fail --location --show-error --silent https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt \
+echo "Downloading whitelist from anudeepND"
+curl $curlopts https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt \
   >>"$whitelist"
 
-# another whitelist (remote)
-#curl --fail --location --show-error --silent https://www.example.com/path/to/list >>"$whitelist"
+# add another whitelist (remote)
+#echo "Downloading another whitelist"
+#curl $curlopts https://www.example.com/path/to/list >>"$whitelist"
 
-# another whitelist (local)
+# add another whitelist (local)
+#echo "Copying another whitelist"
 #cat /path/to/list >>"$whitelist"
 
+echo "Merging blacklists"
 sort --output="$blacklist" --unique "$blacklist"
+
+echo "Merging whitelists"
 sort --output="$whitelist" --unique "$whitelist"
+
+echo "Generating preliminary zone statements"
 for domain in $(comm -23 "$blacklist" "$whitelist"); do
 	printf "zone \"%s\" { type master; file \"/etc/bind/db.null\"; };\n" "$domain" >>"$srcpath"
 done
-cmp --silent "$srcpath" "$dstpath" && exit 3  # no changes
-mv "$srcpath" "$dstpath"
-chmod 644 "$dstpath"
-exit 0
 
+rc=0
+if cmp --silent "$srcpath" "$dstpath"; then
+	echo "There were no changes"
+	rc=3
+else
+	echo "Copying zone statements to $dstpath"
+	install --mode=644 "$srcpath" "$dstpath"
+fi
+exit $rc
+
+# vim: noet sw=8 ts=8

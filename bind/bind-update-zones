@@ -15,11 +15,9 @@ declare -r curlopts='--fail --location --show-error --silent'
 # blacklists
 #
 
-echo "Downloading blacklist from StevenBlack"
-curl $curlopts https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts \
-  | grep '^0\.0\.0\.0\b' \
-  | cut -d' ' -f2 \
-  | grep -F -v '0.0.0.0' \
+echo "Downloading blacklist from EnergizedProtection"
+curl $curlopts https://block.energized.pro/spark/formats/domains.txt \
+  | grep --invert-match '^#' \
   >>"$blacklist"
 
 # add another blacklist (remote)

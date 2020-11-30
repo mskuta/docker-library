@@ -22,6 +22,6 @@ Acknowledgments
 
 This software utilizes domain lists from the following projects:
 
-- [StevenBlack/hosts](https://github.com/StevenBlack/hosts)
+- [EnergizedProtection/block](https://github.com/EnergizedProtection/block)
 - [anudeepND/whitelist](https://github.com/anudeepND/whitelist)
 

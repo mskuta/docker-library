@@ -1,0 +1,6 @@
+---
+ignored:
+  - DL3008
+  - DL3028
+
+# vim: et sw=2 ts=2

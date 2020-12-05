@@ -2,30 +2,38 @@
 
 set -euo pipefail
 
-dstdir=${1:-/etc/bind}
-dstpath="$dstdir/zones.invalid"
-srcpath="$(mktemp -t)"
-blacklist="$(mktemp -t)"
-whitelist="$(mktemp -t)"
+declare -r dstdir=${1:-/etc/bind}
+declare -r dstpath="$dstdir/zones.invalid"
+
+declare -r srcpath="$(mktemp -t)"
+declare -r blacklist="$(mktemp -t)"
+declare -r whitelist="$(mktemp -t)"
 trap 'rm -f "$srcpath" "$blacklist" "$whitelist"' EXIT
 
-declare -r curlopts='--fail --location --show-error --silent'
+declare -r cachedir="/var/local/cache/${0##*/}"
+mkdir -p "$cachedir"
+
+declare -r wgetopts='--quiet --timestamping'
+
+pushd "$cachedir" >/dev/null
 
 #
 # blacklists
 #
 
 echo "Downloading blacklist from EnergizedProtection"
-curl $curlopts https://block.energized.pro/spark/formats/domains.txt \
-  | grep --invert-match '^#' \
-  >>"$blacklist"
+downloadname='domains.txt'
+wget2 $wgetopts https://block.energized.pro/spark/formats/$downloadname
+grep --invert-match '^#' $downloadname >>"$blacklist"
 
 # add another blacklist (remote)
-#echo "Downloading another blacklist"
-#curl $curlopts https://www.example.com/path/to/list >>"$blacklist"
+#echo "Downloading blacklist from ..."
+#downloadname='example.txt'
+#wget2 $wgetopts https://www.example.com/path/to/$downloadname
+#cat $downloadname >>"$blacklist"
 
 # add another blacklist (local)
-#echo "Copying another blacklist"
+#echo "Copying blacklist from ..."
 #cat /path/to/list >>"$blacklist"
 
 #
@@ -33,16 +41,21 @@ curl $curlopts https://block.energized.pro/spark/formats/domains.txt \
 #
 
 echo "Downloading whitelist from anudeepND"
-curl $curlopts https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/whitelist.txt \
-  >>"$whitelist"
+downloadname='whitelist.txt'
+wget2 $wgetopts https://raw.githubusercontent.com/anudeepND/whitelist/master/domains/$downloadname
+cat $downloadname >>"$whitelist"
 
 # add another whitelist (remote)
-#echo "Downloading another whitelist"
-#curl $curlopts https://www.example.com/path/to/list >>"$whitelist"
+#echo "Downloading whitelist from ..."
+#downloadname='example.txt'
+#wget2 $wgetopts https://www.example.com/path/to/$downloadname
+#cat $downloadname >>"$whitelist"
 
 # add another whitelist (local)
-#echo "Copying another whitelist"
+#echo "Copying whitelist from ..."
 #cat /path/to/list >>"$whitelist"
+
+popd >/dev/null
 
 echo "Merging blacklists"
 sort --output="$blacklist" --unique "$blacklist"

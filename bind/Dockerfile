@@ -1,6 +1,6 @@
 FROM phusion/baseimage:bionic-1.0.0
 CMD ["/sbin/my_init"]
-RUN DEBIAN_FRONTEND=noninteractive install_clean bind9 ca-certificates stunnel4
+RUN DEBIAN_FRONTEND=noninteractive install_clean bind9 ca-certificates stunnel4 wget2
 COPY stunnel.conf /etc/stunnel/
 COPY run-stunnel /etc/service/stunnel/run
 COPY run-bind /etc/service/bind/run

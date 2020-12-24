@@ -10,6 +10,7 @@ options {
 	max-cache-size 32M;
 	min-cache-ttl 3600;
 	notify no;
+	version none;
 };
 
 server 127.0.0.1 {

@@ -24,4 +24,5 @@ This software utilizes domain lists from the following projects:
 
 - [EnergizedProtection/block](https://github.com/EnergizedProtection/block)
 - [anudeepND/whitelist](https://github.com/anudeepND/whitelist)
+- [crazy-max/WindowsSpyBlocker](https://github.com/crazy-max/WindowsSpyBlocker)
 

@@ -26,6 +26,11 @@ downloadname='domains.txt'
 wget2 $wgetopts https://block.energized.pro/spark/formats/$downloadname
 grep --invert-match '^#' $downloadname >>"$blacklist"
 
+echo "Downloading blacklist from crazy-max"
+downloadname='spy.txt'
+wget2 $wgetopts https://raw.githubusercontent.com/crazy-max/WindowsSpyBlocker/master/data/hosts/$downloadname
+awk '/^\s*$/ || /^\s*#/ { next } { print $2 }' $downloadname >>"$blacklist"
+
 # add another blacklist (remote)
 #echo "Downloading blacklist from ..."
 #downloadname='example.txt'
